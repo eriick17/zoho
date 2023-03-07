@@ -1,2 +1,2 @@
 # zoho
-Se guardan los scripts para zoho 
+Se guardan los scripts del team  
