@@ -1,0 +1,33 @@
+//RECORD ID PRUEBA 4666173000047950583
+presupuesto = zoho.crm.getRecordById("Quotes",recordId);
+tipoPago = presupuesto.get("Tipo_de_Pago");
+//info presupuesto;
+if(tipoPago == "Crédito")
+{
+	totalGeneral = presupuesto.get("Grand_Total");
+	asunto = presupuesto.get("Subject");
+	cuotas = presupuesto.get("Meses");
+	fechaVencimiento = today;
+	numeroPresupuesto = presupuesto.get("Quote_Number");
+	idCliente = presupuesto.get("Posible_Cliente").get("id");
+	nombreCliente = presupuesto.get("Posible_Cliente").get("name");
+	cedula = presupuesto.get("Nro_de_Documento");
+	paramsMap = Map();
+	paramsMap.put("Name",asunto);
+	paramsMap.put("Presupuesto",recordId);
+	paramsMap.put("Cuotas",cuotas);
+	paramsMap.put("Fecha_de_Vencimiento",fechaVencimiento);
+	paramsMap.put("Numero_de_Presupuesto",numeroPresupuesto);
+	paramsMap.put("Monto_Gs",totalGeneral);
+	paramsMap.put("Posible_Cliente",idCliente);
+	paramsMap.put("Cedula_de_Identidad",cedula);
+	info paramsMap;
+}
+else
+{
+	info "Tipo de pago: Contado";
+}
+paramsMap.put("Quote_Name",recordId);
+//info zoho.crm.updateRecord("Cobranzas",recordId,Map:String({"Posible_Cliente":idCliente}));
+//info zoho.crm.updateRecord("Cobranzas",recordId,Map:String({"Presupuesto":recordId}));
+info zoho.crm.createRecord("Cobranzas",paramsMap,{"trigger":{"workflow","blueprint","approval"}});
