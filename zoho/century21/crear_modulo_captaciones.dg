@@ -1,0 +1,58 @@
+//buscar los registros en el modulo Propiedades (Products)
+propiedades = zoho.crm.searchRecords("Products","(Cantidad_Habitaciones:equals:" + cant_habit + ")");
+//falta incluir los demas criterios en la busqueda
+//consulta sql demo
+//obtiene los registros de propiedades segun los criterios definidos
+queryMap = Map();
+SQLquery = "SELECT id, Tipo_Inmueble, Unit_Price, Cantidad_Habitaciones FROM Products WHERE Unit_Price >= " + precio_min + " AND Unit_Price <= " + precio_max;
+queryMap.put("select_query",SQLquery);
+response = invokeurl
+[
+	url :"https://www.zohoapis.com/crm/v3/coql"
+	type :POST
+	parameters:queryMap.toString()
+	connection:"zoho_crm"
+];
+propiedadesSQL = response.get("data");
+info propiedadesSQL;
+//fin consulta sql
+//info propiedades;
+if(propiedadesSQL.size() >= 1)
+{
+	info "Enontró un registro";
+	//si encontró una propiedad, obtiene los datos y arma un Map para crear un registro en el modulo Captaciones
+	json = Map();
+	json.put("Posible_Cliente",lead_id);
+	//define el tipo de Cliente
+	if(tipo_cliente == "Comprador")
+	{
+		json.put("Tipo_Captacion","Compra");
+	}
+	else if(tipo_cliente == "Vendedor")
+	{
+		json.put("Tipo_Captacion","Venta");
+	}
+	else
+	{
+		json.put("Tipo_Captacion","Venta");
+	}
+	//carga la lista para el subformulario
+	propiedadesList = List();
+	for each  propiedad in propiedadesSQL
+	{
+		jsonPropiedad = Map();
+		jsonPropiedad.put("Propiedad",propiedad.get("id"));
+		jsonPropiedad.put("Tipo",propiedad.get("Tipo_Inmueble"));
+		jsonPropiedad.put("Cantidad_Habitaciones",ifNull(propiedad.get("Cantidad_Habitaciones"),""));
+		jsonPropiedad.put("Precio",propiedad.get("Unit_Price"));
+		propiedadesList.add(jsonPropiedad);
+	}
+	json.put("Propiedades_Sugeridas",propiedadesList);
+	info json;
+	//info zoho.crm.createRecord("Captaciones",json);
+}
+else
+{
+	info "No encontró ninguna propiedad";
+}
+return "Ejecutado con exito";
