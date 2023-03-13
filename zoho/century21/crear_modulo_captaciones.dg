@@ -1,10 +1,12 @@
 //buscar los registros en el modulo Propiedades (Products)
+
 propiedades = zoho.crm.searchRecords("Products","(Cantidad_Habitaciones:equals:" + cant_habit + ")");
 //falta incluir los demas criterios en la busqueda
 //consulta sql demo
 //obtiene los registros de propiedades segun los criterios definidos
+//info lead_id + " " + precio_min + " " + precio_max + " " + cant_habit + " " + tipo_inmueble;
 queryMap = Map();
-SQLquery = "SELECT id, Tipo_Inmueble, Unit_Price, Cantidad_Habitaciones FROM Products WHERE Unit_Price >= " + precio_min + " AND Unit_Price <= " + precio_max;
+SQLquery = "SELECT id, Tipo_Inmueble, Unit_Price, Cantidad_Habitaciones FROM Products WHERE Tipo_Inmueble = '" + tipo_inmueble + "' and (Unit_Price between " + precio_min + " and " + precio_max + " and Cantidad_Habitaciones = " + cant_habit + ")";
 queryMap.put("select_query",SQLquery);
 response = invokeurl
 [

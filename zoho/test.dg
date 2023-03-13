@@ -28,6 +28,9 @@ else
 	info "Tipo de pago: Contado";
 }
 paramsMap.put("Quote_Name",recordId);
+
 //info zoho.crm.updateRecord("Cobranzas",recordId,Map:String({"Posible_Cliente":idCliente}));
 //info zoho.crm.updateRecord("Cobranzas",recordId,Map:String({"Presupuesto":recordId}));
+// crea un registro/modulo
+
 info zoho.crm.createRecord("Cobranzas",paramsMap,{"trigger":{"workflow","blueprint","approval"}});
