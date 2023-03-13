@@ -1,0 +1,10 @@
+deals = zoho.crm.getRelatedRecords("Oportunidades","Leads",leadID);
+quotes = zoho.crm.getRelatedRecords("Cotizaciones","Leads",leadID);
+//obtiene los ultimos regsitros de Oportunidades y Cotizaciones
+lastQuoteID = quotes.get(0).get("id");
+lastDealID = deals.get(0).get("id");
+//actualiza el campo Deal_Name en Quotes, para asociar la oportunidad
+json = Map();
+json.put("Deal_Name", lastDealID);
+updateRecord = zoho.crm.updateRecord("Quotes", lastQuoteID, json);
+info updateRecord;

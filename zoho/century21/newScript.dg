@@ -1,0 +1,65 @@
+mensaje = "";
+queryMap = Map();
+SQLquery = "SELECT id, Tipo_Inmueble, Unit_Price, Cantidad_Habitaciones, Estado" + " FROM Products WHERE ((Tipo_Inmueble = '" + tipo_inmueble + "' and Estado = 'Disponible') and (Unit_Price between " + precio_min + " and " + precio_max + ")) and Cantidad_Habitaciones = " + cantidad_habitaciones + ";";
+queryMap.put("select_query",SQLquery);
+response = invokeurl
+[
+	url :"https://www.zohoapis.com/crm/v3/coql"
+	type :POST
+	parameters:queryMap.toString()
+	connection:"zoho_crm"
+];
+propiedadesSQL = response.get("data");
+info propiedadesSQL;
+//if(1==1){return "ok"; }
+if(propiedadesSQL.size() >= 1)
+{
+	//si encontró al menos una propiedad, obtiene los datos y arma un Map para crear un registro en el modulo Captaciones
+	arrTipoCliente = {};
+	vendedor = "Venta";
+	comprador = "Compra";
+	// define el tipo de Cliente 
+	if(tipo_cliente.equals("Ambos"))
+	{
+		arrTipoCliente.add(comprador);
+		arrTipoCliente.add(vendedor);
+		//json.put("Tipo_Captacion","Compra");
+	}
+	else if(tipo_cliente.equals("Vendedor"))
+	{
+		arrTipoCliente.add(vendedor);
+		//json.put("Tipo_Captacion","Venta");
+	}
+	else
+	{
+		arrTipoCliente.add(comprador);
+		//json.put("Tipo_Captacion","Ambos");
+	}
+	//carga la lista para el subformulario
+	propiedadesList = List();
+	for each  tipo in arrTipoCliente
+	{
+		json = Map();
+		json.put("Cliente",cliente_id);
+		json.put("Tipo_Captacion",tipo);
+		propiedadesList = List();
+		for each  propiedad in propiedadesSQL
+		{
+			jsonPropiedad = Map();
+			jsonPropiedad.put("Propiedad",propiedad.get("id"));
+			jsonPropiedad.put("Tipo",propiedad.get("Tipo_Inmueble"));
+			jsonPropiedad.put("Cantidad_Habitaciones",ifNull(propiedad.get("Cantidad_Habitaciones"),""));
+			jsonPropiedad.put("Precio",propiedad.get("Unit_Price"));
+			propiedadesList.add(jsonPropiedad);
+		}
+		json.put("Propiedades_Sugeridas",propiedadesList);
+		info json;
+		info zoho.crm.createRecord("Captaciones",json);
+	}
+	mensaje = "Ejecutado con éxito";
+}
+else
+{
+	mensaje = "No encontró ninguna propiedad";
+}
+return mensaje;
